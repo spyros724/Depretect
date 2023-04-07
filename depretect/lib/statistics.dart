@@ -1,42 +1,34 @@
+//import 'dart:html';
 import 'package:flutter/material.dart';
+import 'main.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'statistics.dart';
 
-void main() {
-  runApp(const MyApp());
+class StatisticsWidget extends StatefulWidget {
+  //final List<ParkingSpot> parkingspots;
+  const StatisticsWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _StatisticsWidgetState createState() => _StatisticsWidgetState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class _StatisticsWidgetState extends State<StatisticsWidget> {
+  int _selectedIndex = 1;
 
-  // This widget is the root of the application.
-  @override
-  Widget build(BuildContext context) {
-    //initializing commands
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Depretect',
-      home: const MessagerWidget(),
-    );
+/*
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
-}
-
-class MessagerWidget extends StatefulWidget {
-  const MessagerWidget({Key? key}) : super(key: key);
-
-  @override
-  _MessagerWidgetState createState() => _MessagerWidgetState();
-}
-
-class _MessagerWidgetState extends State<MessagerWidget> {
-  int _selectedIndex = 0;
+*/
 
   void _onItemTapped(int index) async {
-    if (index == 1) {
+    if (index == 0) {
       await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => StatisticsWidget()),
-        //TO DO: parkingspots: widget.parkingspots
+        MaterialPageRoute(builder: (context) => MessagerWidget()),
       );
     }
   }
@@ -66,7 +58,7 @@ class _MessagerWidgetState extends State<MessagerWidget> {
       body: Padding(
         padding: EdgeInsets.only(top: 50),
         child: Text(
-          'You idiot cat :<|',
+          'Go to zoo :<|',
           style: TextStyle(color: Colors.black, fontSize: 20.0),
         ),
       ),
