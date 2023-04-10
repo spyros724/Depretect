@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_sparkline/flutter_sparkline.dart';
 
 class StatisticsWidget extends StatefulWidget {
   //final List<ParkingSpot> parkingspots;
@@ -15,6 +16,8 @@ class StatisticsWidget extends StatefulWidget {
 
 class _StatisticsWidgetState extends State<StatisticsWidget> {
   int _selectedIndex = 1;
+
+  List<double> chart_data = [0.2, 0.5, 0.8, 0.3, 0.6, 0.9, 0.1, 0.4, 0.7];
 
 /*
   void _onItemTapped(int index) {
@@ -55,13 +58,32 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
             icon: Icon(Icons.local_hospital)),
         title: Text('Depretect'),
       ),
-      body: Padding(
-        padding: EdgeInsets.only(top: 50),
-        child: Text(
-          'Go to zoo :<|',
-          style: TextStyle(color: Colors.black, fontSize: 20.0),
-        ),
-      ),
+      body: Center(
+          child: Container(
+              padding: EdgeInsets.all(10),
+              height: 200,
+              width: 300,
+              child: Stack(children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: Sparkline(
+                      data: chart_data,
+                      lineGradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.red,
+                          Colors.lightBlue,
+                        ],
+                        stops: [
+                          0.5,
+                          0.5,
+                        ],
+                      )),
+                ),
+              ]))),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 2, 2, 2),
         items: const <BottomNavigationBarItem>[

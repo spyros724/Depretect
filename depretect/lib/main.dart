@@ -33,6 +33,65 @@ class MessagerWidget extends StatefulWidget {
 class _MessagerWidgetState extends State<MessagerWidget> {
   int _selectedIndex = 0;
 
+  final List<Message> _messages = [
+    Message(
+        "Hi, nice to meet you! Text me anything to start a conversation!", "Q")
+  ];
+
+  final List<Message> _questions = [
+    Message("Q1", "Q"),
+    Message("Q2", "Q"),
+    Message("Q3", "Q"),
+    Message("Q4", "Q"),
+    Message("Q5", "Q"),
+    Message("Q6", "Q"),
+    Message("Q7", "Q"),
+    Message("Q8", "Q"),
+    Message("Q9", "Q"),
+    Message("Q10", "Q"),
+    Message("Q11", "Q"),
+    Message("Q12", "Q"),
+    Message("Q13", "Q"),
+    Message("Q14", "Q"),
+    Message("Q15", "Q"),
+    Message("Q16", "Q"),
+  ];
+
+  final TextEditingController _textEditingController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  void _sendMessage(String message) {
+    _scrollToBottom();
+    if (message.isNotEmpty) {
+      setState(() {
+        _messages.add(Message(message, "A"));
+        _messages.add(_questions[
+            (((_messages.length / 2) - 1).toInt()) % _questions.length]);
+        _scrollToBottom();
+      });
+
+      /* simulate a response from the chatbot
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          _messages.add(Message(
+              "I'm sorry, I can't help with that", MessageType.received));
+          _scrollToBottom();
+        });
+        _scrollToBottom();
+      }); */
+
+      _textEditingController.clear();
+    }
+  }
+
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 1),
+      curve: Curves.easeInOut,
+    );
+  }
+
   void _onItemTapped(int index) async {
     if (index == 1) {
       await Navigator.pushReplacement(
@@ -65,12 +124,76 @@ class _MessagerWidgetState extends State<MessagerWidget> {
             icon: Icon(Icons.local_hospital)),
         title: Text('Depretect'),
       ),
-      body: Padding(
-        padding: EdgeInsets.only(top: 50),
-        child: Text(
-          'You idiot cat :<|',
-          style: TextStyle(color: Colors.black, fontSize: 20.0),
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              reverse: false,
+              controller: _scrollController,
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final message = _messages[index];
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
+                  child: Align(
+                    alignment: message.type == "A"
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: message.type == "A"
+                            ? Colors.blue
+                            : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                      child: Text(message.text),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          /*
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+          ),*/
+          Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.grey)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                      controller: _textEditingController,
+                      decoration: InputDecoration(
+                        hintText: "Type a message",
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                      ),
+                      onSubmitted: (message) {
+                        _sendMessage(message);
+                        _scrollToBottom();
+                      }),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    _sendMessage(_textEditingController.text);
+                    _scrollToBottom();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollController.jumpTo(_scrollController.position
+                          .maxScrollExtent); // Jump to the end of the list
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 2, 2, 2),
@@ -91,4 +214,16 @@ class _MessagerWidgetState extends State<MessagerWidget> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+/*
+enum MessageType {
+  sent,
+  received,
+}*/
+
+class Message {
+  final String text;
+  final String type;
+
+  Message(this.text, this.type);
 }
