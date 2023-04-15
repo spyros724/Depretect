@@ -5,10 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 
 class StatisticsWidget extends StatefulWidget {
-  //final List<ParkingSpot> parkingspots;
-  const StatisticsWidget({
-    Key? key,
-  }) : super(key: key);
+  final List<Message> messages;
+  const StatisticsWidget({Key? key, required this.messages}) : super(key: key);
 
   @override
   _StatisticsWidgetState createState() => _StatisticsWidgetState();
@@ -54,6 +52,7 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
         leading: IconButton(
             onPressed: () {
               launch('https://igem.org/');
+              print(widget.messages);
             },
             icon: Icon(Icons.local_hospital)),
         title: Text('Depretect'),

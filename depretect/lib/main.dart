@@ -8,6 +8,11 @@ void main() {
   runApp(const MyApp());
 }
 
+final List<Message> _messages = [
+  Message("Hi, nice to meet you! Text me anything to start a conversation!",
+      "Q", DateTime(2012, 12, 12))
+];
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -28,33 +33,29 @@ class MessagerWidget extends StatefulWidget {
 
   @override
   _MessagerWidgetState createState() => _MessagerWidgetState();
+  List<Message> get messages => _messages;
 }
 
 class _MessagerWidgetState extends State<MessagerWidget> {
   int _selectedIndex = 0;
 
-  final List<Message> _messages = [
-    Message(
-        "Hi, nice to meet you! Text me anything to start a conversation!", "Q")
-  ];
-
   final List<Message> _questions = [
-    Message("Q1", "Q"),
-    Message("Q2", "Q"),
-    Message("Q3", "Q"),
-    Message("Q4", "Q"),
-    Message("Q5", "Q"),
-    Message("Q6", "Q"),
-    Message("Q7", "Q"),
-    Message("Q8", "Q"),
-    Message("Q9", "Q"),
-    Message("Q10", "Q"),
-    Message("Q11", "Q"),
-    Message("Q12", "Q"),
-    Message("Q13", "Q"),
-    Message("Q14", "Q"),
-    Message("Q15", "Q"),
-    Message("Q16", "Q"),
+    Message("Q1", "Q", DateTime(2012, 12, 12)),
+    Message("Q2", "Q", DateTime(2012, 12, 12)),
+    Message("Q3", "Q", DateTime(2012, 12, 12)),
+    Message("Q4", "Q", DateTime(2012, 12, 12)),
+    Message("Q5", "Q", DateTime(2012, 12, 12)),
+    Message("Q6", "Q", DateTime(2012, 12, 12)),
+    Message("Q7", "Q", DateTime(2012, 12, 12)),
+    Message("Q8", "Q", DateTime(2012, 12, 12)),
+    Message("Q9", "Q", DateTime(2012, 12, 12)),
+    Message("Q10", "Q", DateTime(2012, 12, 12)),
+    Message("Q11", "Q", DateTime(2012, 12, 12)),
+    Message("Q12", "Q", DateTime(2012, 12, 12)),
+    Message("Q13", "Q", DateTime(2012, 12, 12)),
+    Message("Q14", "Q", DateTime(2012, 12, 12)),
+    Message("Q15", "Q", DateTime(2012, 12, 12)),
+    Message("Q16", "Q", DateTime(2012, 12, 12)),
   ];
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -64,7 +65,7 @@ class _MessagerWidgetState extends State<MessagerWidget> {
     _scrollToBottom();
     if (message.isNotEmpty) {
       setState(() {
-        _messages.add(Message(message, "A"));
+        _messages.add(Message(message, "A", DateTime.now()));
         _messages.add(_questions[
             (((_messages.length / 2) - 1).toInt()) % _questions.length]);
         _scrollToBottom();
@@ -96,7 +97,10 @@ class _MessagerWidgetState extends State<MessagerWidget> {
     if (index == 1) {
       await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => StatisticsWidget()),
+        MaterialPageRoute(
+            builder: (context) => StatisticsWidget(
+                  messages: widget.messages,
+                )),
         //TO DO: parkingspots: widget.parkingspots
       );
     }
@@ -224,6 +228,7 @@ enum MessageType {
 class Message {
   final String text;
   final String type;
+  final DateTime date;
 
-  Message(this.text, this.type);
+  Message(this.text, this.type, this.date);
 }
