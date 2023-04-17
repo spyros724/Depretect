@@ -2,9 +2,6 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_sparkline/flutter_sparkline.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:flutter_echarts/flutter_echarts.dart';
 
 class StatisticsWidget extends StatefulWidget {
   final List<Message> messages;

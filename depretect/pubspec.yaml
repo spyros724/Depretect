@@ -31,12 +31,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  charts_flutter:
-    git:
-      url: https://github.com/google/charts.git
-      path: charts_flutter
-  flutter_sparkline: ^0.1.0
-  flutter_echarts: ^2.4.0
 
 
   # The following adds the Cupertino Icons font to your application.
