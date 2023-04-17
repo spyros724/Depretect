@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'statistics.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'statistics.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -10,7 +11,7 @@ void main() {
 
 final List<Message> _messages = [
   Message("Hi, nice to meet you! Text me anything to start a conversation!",
-      "Q", DateTime(2012, 12, 12))
+      "Q", DateTime(2012, 12, 12), 0.0)
 ];
 
 class MyApp extends StatelessWidget {
@@ -40,22 +41,22 @@ class _MessagerWidgetState extends State<MessagerWidget> {
   int _selectedIndex = 0;
 
   final List<Message> _questions = [
-    Message("Q1", "Q", DateTime(2012, 12, 12)),
-    Message("Q2", "Q", DateTime(2012, 12, 12)),
-    Message("Q3", "Q", DateTime(2012, 12, 12)),
-    Message("Q4", "Q", DateTime(2012, 12, 12)),
-    Message("Q5", "Q", DateTime(2012, 12, 12)),
-    Message("Q6", "Q", DateTime(2012, 12, 12)),
-    Message("Q7", "Q", DateTime(2012, 12, 12)),
-    Message("Q8", "Q", DateTime(2012, 12, 12)),
-    Message("Q9", "Q", DateTime(2012, 12, 12)),
-    Message("Q10", "Q", DateTime(2012, 12, 12)),
-    Message("Q11", "Q", DateTime(2012, 12, 12)),
-    Message("Q12", "Q", DateTime(2012, 12, 12)),
-    Message("Q13", "Q", DateTime(2012, 12, 12)),
-    Message("Q14", "Q", DateTime(2012, 12, 12)),
-    Message("Q15", "Q", DateTime(2012, 12, 12)),
-    Message("Q16", "Q", DateTime(2012, 12, 12)),
+    Message("Q1", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q2", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q3", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q4", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q5", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q6", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q7", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q8", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q9", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q10", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q11", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q12", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q13", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q14", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q15", "Q", DateTime(2012, 12, 12), 0.0),
+    Message("Q16", "Q", DateTime(2012, 12, 12), 0.0),
   ];
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -65,7 +66,7 @@ class _MessagerWidgetState extends State<MessagerWidget> {
     _scrollToBottom();
     if (message.isNotEmpty) {
       setState(() {
-        _messages.add(Message(message, "A", DateTime.now()));
+        _messages.add(Message(message, "A", DateTime.now(), getRandomFloat()));
         _messages.add(_questions[
             (((_messages.length / 2) - 1).toInt()) % _questions.length]);
         _scrollToBottom();
@@ -83,6 +84,11 @@ class _MessagerWidgetState extends State<MessagerWidget> {
 
       _textEditingController.clear();
     }
+  }
+
+  double getRandomFloat() {
+    Random random = new Random();
+    return random.nextDouble();
   }
 
   void _scrollToBottom() {
@@ -229,6 +235,7 @@ class Message {
   final String text;
   final String type;
   final DateTime date;
+  final double value;
 
-  Message(this.text, this.type, this.date);
+  Message(this.text, this.type, this.date, this.value);
 }
