@@ -66,7 +66,7 @@ class _MessagerWidgetState extends State<MessagerWidget> {
     _scrollToBottom();
     if (message.isNotEmpty) {
       setState(() {
-        _messages.add(Message(message, "A", DateTime.now(), getRandomFloat()));
+        _messages.add(Message(message, "A", DateTime.now(), 0.8));
         _messages.add(_questions[
             (((_messages.length / 2) - 1).toInt()) % _questions.length]);
         _scrollToBottom();

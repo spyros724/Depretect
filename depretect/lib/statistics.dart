@@ -4,6 +4,7 @@ import 'main.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter_echarts/flutter_echarts.dart';
 
 class StatisticsWidget extends StatefulWidget {
   final List<Message> messages;
@@ -15,6 +16,8 @@ class StatisticsWidget extends StatefulWidget {
 
 class _StatisticsWidgetState extends State<StatisticsWidget> {
   int _selectedIndex = 1;
+  DateTime _date = DateTime.now();
+  bool _visibledate = false;
 
   List<double> chart_data = [0.2, 0.5, 0.8, 0.3, 0.6, 0.9, 0.1, 0.4, 0.7];
 
@@ -35,6 +38,7 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
     }
   }
 
+/*
   List<charts.Series<DayAverage, DateTime>> createChartData(
       List<DayAverage> dayAverages) {
     return [
@@ -49,7 +53,7 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
       ),
     ];
   }
-
+*/
   List<DayAverage> calculateDayAverages(List<Message> messages) {
     final Map<DateTime, List<Message>> messagesByDay = {};
     for (final message in messages) {
@@ -70,6 +74,81 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
     }).toList();
   }
 
+  void _showdate() async {
+    /// Εμφάνιση του time picker [showTimePicker] και αποθήκευση του αποτελέσμα-
+    /// τος στην μεταβλητή [result] (τύπου [TimeOfDay]). Καθώς ο χρήστης μπορεί
+    /// να πατήσει cancel, η μεταβλητή αυτή μπορεί να γίνει και null
+    final DateTime? result = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2023, 1),
+      lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color.fromARGB(255, 230, 201, 235), // <-- SEE HERE
+              onPrimary: Colors.pink, // <-- SEE HERE
+              onSurface: Colors.grey, // <-- SEE HERE
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                primary:
+                    Color.fromARGB(255, 219, 161, 229), // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    /// Στην περίπτωση που ο χρήστης έχει επιλέξει ώρα alarm, ενημέρωσε την
+    /// κατάσταση του [Widget], θέτοντας την ώρα στη μεταβλητή [_alarmTime]
+    /// και θέτοντας το boolean flag [_visibleAlarmTime] σε true
+    if (result != null) {
+      setState(() {
+        _date = result;
+        _date = DateTime(_date.year, _date.month, _date.day);
+        _visibledate = true;
+      });
+    }
+  }
+
+  /*
+
+  List<double> _calculateDailyAverages(List<Message> messages) {
+    // calculate daily averages
+    Map<DateTime, List<double>> dailyValues = {};
+    for (Message message in messages) {
+      DateTime date = message.date;
+      double value = message.value;
+      dailyValues.update(date, (values) => [...values, value],
+          ifAbsent: () => [value]);
+    }
+    List<double> dailyAverages = [];
+    for (DateTime date in dailyValues.keys) {
+      List<double> values = dailyValues[date]!;
+      double average = values.reduce((a, b) => a + b) / values.length;
+      dailyAverages.add(average);
+    }
+    return dailyAverages;
+  }
+
+  List<dynamic> _formatChartData(List<double> dailyAverages) {
+    // format data for chart
+    List<String> xValues = [];
+    List<double> yValues = [];
+    for (int i = 0; i < dailyAverages.length; i++) {
+      DateTime date = widget.messages[i].date;
+      String dateString = '${date.year}-${date.month}-${date.day}';
+      xValues.add(dateString);
+      yValues.add(dailyAverages[i]);
+    }
+    return [xValues, yValues];
+  }
+  */
+
   static const List<Widget> _widgetOptions = <Widget>[
     Text(
       'Messager',
@@ -79,10 +158,23 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
     ),
   ];
 
+  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController1 = ScrollController();
+
   @override
   Widget build(BuildContext context) {
+    List<Message> messagesWithDateOnly = widget.messages.map((message) {
+      DateTime dateOnly =
+          DateTime(message.date.year, message.date.month, message.date.day);
+      return Message(message.text, message.type, dateOnly, message.value);
+    }).toList();
+
     final dayAverages = calculateDayAverages(widget.messages);
-    final chartData = createChartData(dayAverages);
+    messagesWithDateOnly = messagesWithDateOnly.reversed.toList();
+    List<Message> filteredMessages =
+        messagesWithDateOnly.where((message) => message.date == _date).toList();
+    List<DayAverage> reversedAverages = dayAverages.reversed.toList();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -95,71 +187,90 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
             icon: Icon(Icons.local_hospital)),
         title: Text('Depretect'),
       ),
-      body: charts.TimeSeriesChart(
-        chartData,
-        animate: true,
-        behaviors: [
-          charts.SeriesLegend(
-            position: charts.BehaviorPosition.bottom,
-            horizontalFirst: false,
-            cellPadding: EdgeInsets.only(right: 4.0, bottom: 4.0),
-            showMeasures: true,
-            legendDefaultMeasure: charts.LegendDefaultMeasure.average,
-            //measureFormatter: (num ?value) => value.toStringAsFixed(2),
-            entryTextStyle: charts.TextStyleSpec(
-              color: charts.MaterialPalette.black,
-              fontSize: 12,
-              fontFamily: 'Roboto',
-              fontWeight: 'light',
-            ),
-          ),
-        ],
-        primaryMeasureAxis: charts.NumericAxisSpec(
-          tickProviderSpec:
-              charts.BasicNumericTickProviderSpec(desiredTickCount: 5),
-          renderSpec: charts.GridlineRendererSpec(
-            labelStyle: charts.TextStyleSpec(
-              color: charts.MaterialPalette.gray.shade400,
-              fontSize: 12,
-              fontFamily: 'Roboto',
-              fontWeight: 'light',
-            ),
-            lineStyle: charts.LineStyleSpec(
-              color: charts.MaterialPalette.gray.shade200,
-            ),
-          ),
-        ),
-        domainAxis: charts.DateTimeAxisSpec(
-          tickProviderSpec: charts.DayTickProviderSpec(increments: [1]),
-          renderSpec: charts.SmallTickRendererSpec<DateTime>(
-            labelStyle: charts.TextStyleSpec(
-              color: charts.MaterialPalette.gray.shade400,
-              fontSize: 12,
-              fontFamily: 'Roboto',
-              fontWeight: 'light',
-            ),
-            lineStyle: charts.LineStyleSpec(
-              color: charts.MaterialPalette.gray.shade200,
-            ),
-          ),
-        ),
-        defaultRenderer: charts.LineRendererConfig(
-          includePoints: true,
-          includeArea: true,
-          stacked: true,
-        ),
-        dateTimeFactory: const charts.LocalDateTimeFactory(),
-        selectionModels: [
-          charts.SelectionModelConfig(
-            changedListener: (charts.SelectionModel model) {
-              if (model.hasDatumSelection) {
-                print(model.selectedSeries[0]
-                    .measureFn(model.selectedDatum[0].index));
-              }
-            },
-          ),
-        ],
-      ),
+      body: Column(children: [
+        Padding(
+            padding: EdgeInsets.all(10),
+            child: SizedBox(
+              height: 200,
+              child: ListView.builder(
+                itemCount: reversedAverages.length,
+                itemBuilder: (BuildContext context, int index) {
+                  String subtitleText = '';
+
+                  if (reversedAverages[index].average > 0.5) {
+                    subtitleText = 'Above average';
+                  } else {
+                    subtitleText = 'Below average';
+                  }
+
+                  return ListTile(
+                    title: Text(
+                        '${reversedAverages[index].date.day}/${reversedAverages[index].date.month}/${reversedAverages[index].date.year}'),
+                    subtitle: Text(subtitleText),
+                  );
+                },
+              ),
+            )),
+        Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Select a date... How were you feeling back then?',
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _showdate,
+                      icon: Icon(Icons.calendar_month),
+                      tooltip: 'Add date',
+                    ),
+                    Visibility(
+                        visible: _visibledate,
+                        child: Text(_date != null
+                            ? '${_date.day}/${_date.month}/${_date.year}'
+                            : '')),
+                  ],
+                ),
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    reverse: false,
+                    controller: _scrollController1,
+                    itemCount: filteredMessages.length,
+                    itemBuilder: (context, index) {
+                      final message = filteredMessages[index];
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        child: Align(
+                          alignment: message.type == "A"
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: message.type == "A"
+                                  ? Colors.blue
+                                  : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 8.0),
+                            child: Text(message.text),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            )),
+      ]),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 2, 2, 2),
         items: const <BottomNavigationBarItem>[
